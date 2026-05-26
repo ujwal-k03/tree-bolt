@@ -13,19 +13,19 @@ Living punch list of known gaps and follow-ups. Add as you discover, strike when
 
 ## Resolver — incomplete / unsupported features
 
-- [ ] `TableFactor::TableFunction`, `TableFactor::Function`, `TableFactor::UNNEST` — currently resolve their exprs but don't register as sources (TODO comments in `from.rs`).
-- [ ] `TableFactor::Pivot` / `Unpivot` — only the inner table is traversed; pivot semantics are dropped.
-- [ ] `TableFactor::MatchRecognize` / `XmlTable` / `SemanticView` / `JsonTable` / `OpenJsonTable` — return `UnsupportedTableFactor`.
-- [ ] `Statement::Insert` / `Update` / `Delete` / `Merge` / etc. — only `Statement::Query` is supported.
-- [ ] `Expr::Lambda`, `Expr::MatchAgainst`, `Expr::MemberOf`, `Expr::Dictionary`, `Expr::Map`, `Expr::Interval` — currently no-op in `resolve_expr`; revisit if any can contain column refs.
+- [x] `TableFactor::TableFunction`, `TableFactor::Function`, `TableFactor::UNNEST` — currently resolve their exprs but don't register as sources (TODO comments in `from.rs`).
+- [x] `TableFactor::Pivot` / `Unpivot` — only the inner table is traversed; pivot semantics are dropped.
+- [x] `TableFactor::MatchRecognize` / `XmlTable` / `SemanticView` / `JsonTable` / `OpenJsonTable` — return `UnsupportedTableFactor`.
+- [x] `Statement::Insert` / `Update` / `Delete` / `Merge` / etc. — only `Statement::Query` is supported.
+- [x] `Expr::Lambda`, `Expr::MatchAgainst`, `Expr::MemberOf`, `Expr::Dictionary`, `Expr::Map`, `Expr::Interval` — currently no-op in `resolve_expr`; revisit if any can contain column refs.
 - [ ] `JoinConstraint::Using` — recognized but doesn't populate `join_columns`. `Natural` joins similar.
 
 ## Resolver — design follow-ups
 
-- [ ] **Drop guard for `push_accumulator`/`pop_accumulator`.** Early-return on `?` between push and pop would leak a frame. Cheap to make impossible.
-- [ ] **Tighten `ColumnRef` invariant.** Today `source_name: String` is a key in *some* visible scope's `sources` map, but consumers must search to find which scope. Consider adding `ScopeId` to make the resolution explicit.
-- [ ] **Wire up `ColumnRefSource` enum** in `scope/mod.rs` — declared but unused. Likely the seed for typed dependencies (direct / predicate / join / group / sort).
-- [ ] **`ResolutionOptions` fields are dead.** `expand_select_wildcards`, `qualify_columns`, `qualify_tables` are declared but never read. Either wire them up or remove.
+- [x] **Drop guard for `push_accumulator`/`pop_accumulator`.** Early-return on `?` between push and pop would leak a frame. Cheap to make impossible.
+- [x] **Tighten `ColumnRef` invariant.** Today `source_name: String` is a key in *some* visible scope's `sources` map, but consumers must search to find which scope. Consider adding `ScopeId` to make the resolution explicit.
+- [x] **Wire up `ColumnRefSource` enum** in `scope/mod.rs` — declared but unused. Likely the seed for typed dependencies (direct / predicate / join / group / sort).
+- [] **`ResolutionOptions` fields are dead.** `expand_select_wildcards`, `qualify_columns`, `qualify_tables` are declared but never read. Either wire them up or remove.
 
 ## Testing
 

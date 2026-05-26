@@ -130,6 +130,7 @@ impl<'r, T: SchemaProvider> ResolutionContext<'r, T> {
                 // there is no point of creating a new scope for each set of parentheses
                 self.resolve_query(query, ScopeType::Root, false)?;
             }
+            // TODO: Left unsupported on purpose. Too much work to support everything
             _ => {
                 return Err(ResolutionError::UnsupportedQueryType(std::any::type_name::<Statement>().into()));
             }

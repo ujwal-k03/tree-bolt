@@ -201,16 +201,31 @@ impl<'r, T: SchemaProvider> ResolutionContext<'r, T> {
                     .collect();
                 *expr = Expr::CompoundIdentifier(self.resolve_col(col_ident, &source_name)?);
             }
+            Expr::Interval(interval) => {
+                self.resolve_expr(&mut interval.value)?;
+            }
+            Expr::MemberOf(member_of) => {
+                self.resolve_expr(&mut member_of.value)?;
+                self.resolve_expr(&mut member_of.array)?;
+            }
+            Expr::Dictionary(fields) => {
+                for field in fields {
+                    self.resolve_expr(&mut field.value)?;
+                }
+            }
+            Expr::Map(map) => {
+                for entry in &mut map.entries {
+                    self.resolve_expr(&mut entry.key)?;
+                    self.resolve_expr(&mut entry.value)?;
+                }
+            }
+
             | Expr::Value(_) // No recurse
-            | Expr::Wildcard(_) // Should I expand this?
-            | Expr::QualifiedWildcard(..) // Should I expand this?
+            | Expr::Wildcard(_) // Expansion handled at select-projection level
+            | Expr::QualifiedWildcard(..) // Expansion handled at select-projection level
             | Expr::TypedString(_) // No recurse
-            | Expr::Interval(_) // Should I resolve this?
-            | Expr::MatchAgainst { .. } // Should I resolve this?
-            | Expr::Lambda(_) // Should I resolve this?
-            | Expr::MemberOf(_) // Should I resolve this?
-            | Expr::Dictionary(_) // Should I resolve this?
-            | Expr::Map(_) => {} // Should I resolve this?
+            | Expr::MatchAgainst { .. } // TODO: columns are Vec<ObjectName>, needs manual resolve_col
+            | Expr::Lambda(_) => {} // TODO: params introduce new scope bindings
         }
 
         Ok(())
