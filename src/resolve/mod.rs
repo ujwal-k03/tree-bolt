@@ -6,7 +6,7 @@ mod query;
 mod from;
 mod function;
 mod column;
-mod scope;
+pub mod scope;
 
 use sqlparser::ast::Statement;
 
@@ -77,7 +77,7 @@ impl<'r, T: SchemaProvider> ResolutionContext<'r, T> {
     }
 
     /// Records a column reference into every active accumulator frame.
-    /// Base-column dependencies propagate through subquery boundaries — the
+    /// Base-column dependencies propagate through subquery boundaries - the
     /// outer expression's lineage is the flat union of every base column
     /// touched while resolving it, regardless of nesting depth. No-op when
     /// no frame is active.

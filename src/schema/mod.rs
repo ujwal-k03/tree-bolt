@@ -1,7 +1,7 @@
 pub mod provider;
 
 pub struct TableSchema {
-    pub(crate) columns: Vec<String>
+    pub columns: Vec<String>
 }
 
 pub trait SchemaProvider {

@@ -1,0 +1,1 @@
+SELECT * FROM gold.order_master_bi

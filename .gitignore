@@ -2,7 +2,6 @@
 .vscode
 .idea
 .cursor
-/docs
 /src/schema/data
 /src/main.rs
 *.json

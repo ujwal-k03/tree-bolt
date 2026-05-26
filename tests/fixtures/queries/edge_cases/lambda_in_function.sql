@@ -1,0 +1,1 @@
+SELECT func1(x -> -x) FROM x

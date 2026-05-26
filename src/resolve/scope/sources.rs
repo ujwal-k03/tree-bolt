@@ -209,3 +209,85 @@ impl ScopeSource {
         })
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::schema::TableSchema;
+    use sqlparser::ast::{Ident, ObjectNamePart, TableAlias};
+
+    fn ident(s: &str) -> ObjectNamePart {
+        ObjectNamePart::Identifier(Ident::new(s))
+    }
+
+    fn table(ident: Vec<&str>, columns: Vec<&str>) -> TableSource {
+        TableSource {
+            ident: ident.into_iter().map(String::from).collect(),
+            columns: columns.into_iter().map(String::from).collect(),
+        }
+    }
+
+    #[test]
+    fn from_schema_without_alias_keeps_columns() {
+        let schema = TableSchema { columns: vec!["a".into(), "b".into()] };
+        let src = TableSource::from_schema(vec!["t".into()], schema, &None).unwrap();
+        assert_eq!(src.columns, vec!["a", "b"]);
+    }
+
+    #[test]
+    fn from_schema_renames_columns_when_alias_columns_match() {
+        let schema = TableSchema { columns: vec!["a".into(), "b".into()] };
+        let alias = TableAlias {
+            name: Ident::new("t"),
+            explicit: false,
+            columns: vec![
+                sqlparser::ast::TableAliasColumnDef { name: Ident::new("x"), data_type: None },
+                sqlparser::ast::TableAliasColumnDef { name: Ident::new("y"), data_type: None },
+            ],
+        };
+        let src = TableSource::from_schema(vec!["t".into()], schema, &Some(alias)).unwrap();
+        assert_eq!(src.columns, vec!["x", "y"]);
+    }
+
+    #[test]
+    fn from_schema_errors_when_alias_column_count_mismatches() {
+        let schema = TableSchema { columns: vec!["a".into(), "b".into()] };
+        let alias = TableAlias {
+            name: Ident::new("t"),
+            explicit: false,
+            columns: vec![sqlparser::ast::TableAliasColumnDef {
+                name: Ident::new("x"),
+                data_type: None,
+            }],
+        };
+        let err = TableSource::from_schema(vec!["t".into()], schema, &Some(alias)).unwrap_err();
+        assert!(matches!(err, ResolutionError::AliasLengthMismatch(_)));
+    }
+
+    #[test]
+    fn match_name_matches_suffix_idents() {
+        let src = table(vec!["db", "users"], vec!["id"]);
+
+        assert!(src.match_name(&[ident("users")]).unwrap());
+        assert!(src.match_name(&[ident("db"), ident("users")]).unwrap());
+        assert!(!src.match_name(&[ident("orders")]).unwrap());
+        assert!(!src.match_name(&[ident("other"), ident("users")]).unwrap());
+    }
+
+    #[test]
+    fn match_col_returns_ambiguous_on_duplicate_columns() {
+        let src = table(vec!["t"], vec!["id", "id", "name"]);
+
+        assert!(src.match_col("name").unwrap());
+        assert!(!src.match_col("missing").unwrap());
+
+        let err = src.match_col("id").unwrap_err();
+        assert!(matches!(err, ResolutionError::AmbiguousColumn(_)));
+    }
+
+    #[test]
+    fn correlation_name_is_last_ident_part() {
+        let src = table(vec!["db", "schema", "users"], vec![]);
+        assert_eq!(src.get_correlation_name(), "users");
+    }
+}

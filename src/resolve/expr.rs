@@ -11,7 +11,7 @@ impl<'r, T: SchemaProvider> ResolutionContext<'r, T> {
     ) -> Result<(), ResolutionError> {
         match expr {
             // === Direct subquery containers (create new scope) ===
-            // Subqueries are not sources — their internal column references
+            // Subqueries are not sources - their internal column references
             // propagate into every enclosing accumulator via record_column's
             // write-to-all behavior, so no explicit boundary handling is needed.
             Expr::Subquery(query) => {
@@ -55,7 +55,7 @@ impl<'r, T: SchemaProvider> ResolutionContext<'r, T> {
                 self.resolve_expr(expr)?;
                 self.resolve_expr_slice(list)?;
             }
-            // Same signature: single Box<Expr> — recurse on expr only
+            // Same signature: single Box<Expr> - recurse on expr only
             Expr::IsFalse(expr)
             | Expr::IsNotFalse(expr)
             | Expr::IsTrue(expr)

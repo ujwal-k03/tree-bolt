@@ -52,7 +52,7 @@ println!("{}", serde_json::to_string_pretty(&scopes)?);
 
 `scopes[0]` is the root scope; nested scopes are reachable via `children` ids and `parent` back-links.
 
-Or just run the binary entry point, which resolves `docs/test_queries/query1.sql` against the bundled CSV schemas and writes the result to `src/resolution_results.json`:
+Or just run the binary entry point, which resolves `tests/fixtures/queries/real_world/chart_reverse_manifest_metrics.sql` against the bundled CSV schemas and writes the result to `src/resolution_results.json`:
 
 ```bash
 cargo run
@@ -137,7 +137,12 @@ src/
   lineage/         # downstream lineage extraction (stub)
 docs/
   analysis.md      # design notes
-  test_queries/    # sample SQL used by the binary
+  queries/         # sample SQL grouped by what each query exercises
+    real_world/    # production-shaped queries (CTEs, joins, windows)
+    scope_tree/    # minimal queries chosen for specific scope shapes
+    cte/           # CTE shadowing / visibility / name collisions
+    edge_cases/    # one-liners that probe a single resolver concern
+    unsupported/   # statements the resolver currently rejects
 ```
 
 ## Contributing
