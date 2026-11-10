@@ -139,7 +139,6 @@ impl<'r, T: SchemaProvider> ResolutionContext<'r, T> {
             self.exit_scope();
         }
 
-        // TODO: Choosing to skip the rest for now. Maybe revisit later. :0
         Ok(())
     }
 
